@@ -1,14 +1,15 @@
-from pydantic import BaseModel
-from datetime import date
+from sqlalchemy import Column, String, Date, Text
+from backend.db import Base
 
 
+class HackathonDB(Base):
+    __tablename__ = "hackathons"
 
-class Hackathon(BaseModel):
-    id: str
-    title: str
-    start_data: date
-    end_date: date
-    location: str
-    url: str
-    source: str
-    tags: list[str] = []
+    id = Column(String, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    location = Column(String)
+    url = Column(String, unique=True, nullable=False)
+    source = Column(String, nullable=False)
+    tags = Column(Text, default="")  # Comma-separated tags
