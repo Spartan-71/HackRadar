@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime
-from backend.models import Hackathon
+from backend.schemas import Hackathon
 from pydantic import ValidationError
 
 def parse_hackathon_dates(date_str: str):
@@ -39,7 +39,7 @@ def parse_hackathon_dates(date_str: str):
     except (ValueError, IndexError):
         return None, None
 
-def fetch_devpost_hackathon() -> list[Hackathon]:
+def fetch_devpost_hackathons() -> list[Hackathon]:
     """
     Fetches and validates hackathon data from the official Devpost API.
     """
@@ -69,7 +69,7 @@ def fetch_devpost_hackathon() -> list[Hackathon]:
             hackathon = Hackathon(
                 id=str(item.get("id")),
                 title=item.get("title"),
-                start_data=start_date,
+                start_date=start_date,
                 end_date=end_date,
                 location=location,
                 url=item.get("url"),
