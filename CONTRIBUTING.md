@@ -2,7 +2,6 @@
 
 Thank you for showing interest in contributing to **HackRadar**! We welcome all kinds of contributions — bug fixes, new scrapers, feature requests, or improvements to the documentation.
 
----
 
 ## 🛠️ How to Contribute
 
@@ -22,7 +21,6 @@ Thank you for showing interest in contributing to **HackRadar**! We welcome all 
    ```
 6. Open a Pull Request.
 
----
 
 ## ✅ Guidelines
 
@@ -31,7 +29,6 @@ Thank you for showing interest in contributing to **HackRadar**! We welcome all 
 * Write clear and concise commit messages.
 * If adding a new scraper, place it in the `adapters/` folder.
 
----
 
 ## 📞 Need Help?
 
