@@ -2,13 +2,19 @@ from fastapi import FastAPI, Depends, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import date
+from contextlib import asynccontextmanager
 
 from backend.schemas import Hackathon
 from backend.crud import get_upcoming
+from backend.scheduler import start_scheduler
 from backend.db import SessionLocal
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
 
-app =FastAPI()
+app =FastAPI(lifespan=lifespan)
 
 def get_db():
     db = SessionLocal()
@@ -16,7 +22,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
 
 @app.get("/hackathons",response_model=List[Hackathon])
 def list_hackathons(
