@@ -63,7 +63,6 @@ def scrape_mlh_events() -> list[Hackathon]:
             url=link,
             source="MLH"
         )
-        print(f"{hackathon}/n")
 
         events.append(hackathon)
 
