@@ -9,6 +9,7 @@ dependencies = [
     "beautifulsoup4>=4.13.4",
     "cloudscraper>=1.2.71",
     "fastapi>=0.116.0",
+    "psycopg2-binary>=2.9.10",
     "pydantic>=2.11.7",
     "requests>=2.32.4",
     "sqlalchemy>=2.0.41",
