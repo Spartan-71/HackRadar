@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: anish
+      POSTGRES_PASSWORD: anish123
+      POSTGRES_DB: hackradar
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anish -d hackradar"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://anish:anish123@db:5432/hackradar
+      SCRAPE_ON_START: "1"
+    ports:
+      - "8000:8000"
+
+  scraper:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://anish:anish123@db:5432/hackradar
+    entrypoint: ["python","-m", "tasks.fetch_and_store"]
+
+volumes:
+  db_data:
