@@ -1,4 +1,5 @@
 import requests
+import hashlib
 from datetime import datetime
 from backend.schemas import Hackathon
 from pydantic import ValidationError
@@ -41,46 +42,57 @@ def parse_hackathon_dates(date_str: str):
 
 def fetch_devpost_hackathons() -> list[Hackathon]:
     """
-    Fetches and validates hackathon data from the official Devpost API.
+    Fetches and validates hackathon data from the first 20 pages of the official Devpost API.
     """
-    url = "https://devpost.com/api/hackathons"
-    try:
-        resp = requests.get(url)
-        resp.raise_for_status()
-        hackathon_data = resp.json().get("hackathons", [])
-    except requests.RequestException as e:
-        print(f"Error fetching URL: {e}")
-        return []
-    except ValueError:
-        print("Error decoding JSON from response.")
-        return []
-
     hackathons = []
-    for item in hackathon_data:
-        start_date, end_date = parse_hackathon_dates(
-            item.get("submission_period_dates")
-        )
-
-        location = "Online"
-        if item.get("displayed_location"):
-            location = item["displayed_location"].get("location", "Online")
-
+    for page in range(1, 21):
+        url = f"https://devpost.com/api/hackathons?page={page}"
         try:
-            hackathon = Hackathon(
-                id=str(item.get("id")),
-                title=item.get("title"),
-                start_date=start_date,
-                end_date=end_date,
-                location=location,
-                url=item.get("url"),
-                source="devpost",
-                tags=[theme["name"] for theme in item.get("themes", [])]
+            resp = requests.get(url)
+            resp.raise_for_status()
+            hackathon_data = resp.json().get("hackathons", [])
+        except requests.RequestException as e:
+            print(f"Error fetching URL (page {page}): {e}")
+            continue
+        except ValueError:
+            print(f"Error decoding JSON from response on page {page}.")
+            continue
+
+        for item in hackathon_data:
+
+            if item.get("open_state") == "ended":
+                break
+            start_date, end_date = parse_hackathon_dates(
+                item.get("submission_period_dates")
             )
-            hackathons.append(hackathon)
-        except ValidationError as e:
-            print(f"Skipping hackathon due to validation error: {item.get('title')}")
-            print(e)
-    
+
+            mode = "Online"
+            location: str
+            if item.get("displayed_location"):
+                location = item["displayed_location"].get("location", "Online")
+            if location != "Online":
+                mode = "Offline"
+            else:
+                location = "Everywhere"
+
+            try:
+                hackathon = Hackathon(
+                    id=hashlib.sha256(str(item.get("id")).encode()).hexdigest(),
+                    title=item.get("title"),
+                    start_date=start_date,
+                    end_date=end_date,
+                    location=location,
+                    url=item.get("url"),
+                    mode=mode,
+                    status=item.get("open_state"),
+                    source="devpost",
+                    tags=[theme["name"] for theme in item.get("themes", [])]
+                )
+                hackathons.append(hackathon)
+            except ValidationError as e:
+                print(f"Skipping hackathon due to validation error: {item.get('title')}")
+                print(e)
     return hackathons
 
-
+if __name__ == "__main__":
+    fetch_devpost_hackathons()
