@@ -9,6 +9,8 @@ class Hackathon(BaseModel):
     end_date: date
     location: str
     url: str
+    mode: str
+    status: str
     source: str
     tags: List[str] = []
 

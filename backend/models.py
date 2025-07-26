@@ -9,7 +9,9 @@ class HackathonDB(Base):
     title = Column(String, nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-    location = Column(String)
+    location = Column(String,nullable=False)
     url = Column(String, unique=True, nullable=False)
+    mode = Column(String,nullable=False)
+    status = Column(String,nullable=False)
     source = Column(String, nullable=False)
-    tags = Column(Text, default="")  # Comma-separated tags
+    tags = Column(Text, default="",nullable=True)
