@@ -75,7 +75,7 @@ def fetch_unstop_hackathons() -> list[Hackathon]:
                     tags.append(filter_item.get("name", ""))
             try:
                 hackathon = Hackathon(
-                    id=hashlib.sha256(str(item.get("id")).encode()).hexdigest(),
+                    id=hashlib.sha256(str(item.get("title")).encode()).hexdigest(),
                     title=item.get("title"),
                     start_date=start_date,
                     end_date=end_date,
