@@ -14,6 +14,7 @@ def upsert_hackathon(db: Session, hack: Hackathon):
         location=hack.location,
         url=hack.url,
         mode=hack.mode,
+        status=hack.status, 
         source=hack.source,
         tags=",".join(hack.tags)
     )
