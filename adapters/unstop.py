@@ -1,5 +1,6 @@
 import requests
 import json
+import hashlib
 from datetime import datetime
 from backend.schemas import Hackathon
 from pydantic import ValidationError
@@ -66,9 +67,7 @@ def fetch_unstop_hackathons() -> list[Hackathon]:
 
         for item in hackathon_data:
             start_date, end_date = parse_unstop_dates(item.get("start_date"))
-            location = "Online"
-            if item.get("region") and item.get("region") != "online":
-                location = item.get("region", "Online")
+            
             # Extract tags from filters
             tags = []
             for filter_item in item.get("filters", []):
@@ -76,12 +75,14 @@ def fetch_unstop_hackathons() -> list[Hackathon]:
                     tags.append(filter_item.get("name", ""))
             try:
                 hackathon = Hackathon(
-                    id=str(item.get("id")),
+                    id=hashlib.sha256(str(item.get("id")).encode()).hexdigest(),
                     title=item.get("title"),
                     start_date=start_date,
                     end_date=end_date,
-                    location=location,
+                    location="Everywhere",
                     url=item.get("seo_url"),
+                    mode=item.get("region"),
+                    status="ongoing",
                     source="unstop",
                     tags=tags
                 )
