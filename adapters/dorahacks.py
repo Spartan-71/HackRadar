@@ -1,4 +1,5 @@
 import requests
+import hashlib
 from backend.schemas import Hackathon
 from datetime import datetime
 
@@ -30,21 +31,33 @@ def fetch_dorahacks_hackathons() -> list[Hackathon]:
         
         hackathons_data = []
         for hack in all_hackathons:
+
             start_date = datetime.fromtimestamp(hack.get("start_time")) if hack.get("start_time") else None
             end_date = datetime.fromtimestamp(hack.get("end_time")) if hack.get("end_time") else None
-            
+
+            curr_status = hack.get("status")
+            status = "upcoming" if curr_status==0 else "ongoing"
+            mode = "Online" if hack.get("participation_form")=="Virtual" else "Offline"
+            location= "Everywhere" if not hack.get("venue_name") else hack.get("venue_name")
+
             hackathon = Hackathon(
-                id=str(hack.get('id')),
+                id=hashlib.sha256(hack.get("title").encode()).hexdigest(),
                 title=hack.get("title"),
-                url=f"https://dorahacks.io/hackathon/{hack.get('uname')}/detail",
                 start_date=start_date.date() if start_date else None,
                 end_date=end_date.date() if end_date else None,
-                location=hack.get("participation_form"),
-                source="dorahacks"
+                location=location,
+                url=f"https://dorahacks.io/hackathon/{hack.get('uname')}/detail",
+                mode=mode,
+                status=status,
+                source="dorahacks",
+                tags=hack.get("field")
             )
             hackathons_data.append(hackathon)
-
         return hackathons_data
     except requests.exceptions.RequestException as e:
         print(f"Error fetching hackathons from DoraHacks: {e}") 
         return []
+    
+
+if __name__ == "__main__":
+    fetch_dorahacks_hackathons()
