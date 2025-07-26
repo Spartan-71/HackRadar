@@ -50,20 +50,28 @@ def scrape_mlh_events() -> list[Hackathon]:
         format_tag = event.find("div", class_="event-hybrid-notes")
         format_type = format_tag.get_text(strip=True) if format_tag else "In-Person"
         
-        location: str = "Online"
+        location: str = "Everywhere"
+        mode: str = "Online"
         if format_type=="In-Person Only":
+            mode="Offline"
             location=f"{city}, {state}"
 
         hackathon = Hackathon(
-            id=hashlib.sha256(link.encode()).hexdigest(),
+            id=hashlib.sha256(name.encode()).hexdigest(),
             title=name,
             start_date=start_date,
             end_date=end_date,
             location=location,
             url=link,
-            source="MLH"
+            mode=mode,
+            status="Upcoming",
+            source="MLH",
         )
-
+        print(hackathon)
         events.append(hackathon)
 
     return events
+
+
+if __name__ == "__main__":
+    scrape_mlh_events()
